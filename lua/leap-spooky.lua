@@ -30,7 +30,16 @@ local function spooky_action(action, kwargs)
     if cross_window then api.nvim_set_current_win(target.wininfo.winid) end
     api.nvim_win_set_cursor(0, { target.pos[1], target.pos[2]-1 })
     -- Execute :normal action. (Intended usage: select some text object.)
+
+    -- workaround to fallback to the default 'j', 'k' mapping during the spooky action.
+    -- In vscode neovim, we need to remap 'j', 'k' to call vscode's wrapped line movement
+    -- api to bypass folded lines, which is not compatible with the spooky action.
+    --
+    -- We set a global variable to indicate that we are in spooky action, and use it to
+    -- fallback to the default 'j', 'k' mapping.
+    vim.g.leap_spooky_action = 1
     vim.cmd("normal " .. action())  -- don't use bang - custom text objects should work too
+    vim.g.leap_spooky_action = 0
     -- (The operation itself will be executed after exiting.)
 
     -- Follow-up:
