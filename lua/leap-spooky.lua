@@ -17,6 +17,7 @@ local function spooky_action(action, kwargs)
     local operator = vim.v.operator
     local on_return = kwargs.on_return
     local keeppos = kwargs.keeppos
+    local non_textobj = kwargs.non_textobj
     local saved_view = vim.fn.winsaveview()
     -- Handle cross-window operations.
     local source_win = vim.fn.win_getid()
@@ -38,7 +39,11 @@ local function spooky_action(action, kwargs)
     -- We set a global variable to indicate that we are in spooky action, and use it to
     -- fallback to the default 'j', 'k' mapping.
     vim.g.leap_spooky_action = 1
-    vim.cmd("normal " .. action())  -- don't use bang - custom text objects should work too
+    if non_textobj then
+        action() 
+    else
+        vim.cmd("normal " .. action())  -- don't use bang - custom text objects should work too
+    end
     vim.g.leap_spooky_action = 0
     -- (The operation itself will be executed after exiting.)
 
@@ -119,6 +124,15 @@ local function setup(kwargs)
           return v_exit() .. "V" .. (n_js > 0 and (tostring(n_js) .. "j") or "")
         end,
       })
+
+      -- Treesitter Hopper
+      table.insert(mappings, {
+        scope = scope,
+        keeppos = keeppos,
+        lhs = key .. "n",
+        non_textobj = true,
+        action = require('tsht').nodes
+      })
     end
   end
 
@@ -139,6 +153,7 @@ local function setup(kwargs)
             action = spooky_action(mapping.action, {
               keeppos = mapping.keeppos,
               on_return = yank_paste and "p",
+              non_textobj = mapping.non_textobj,
             }),
             target_windows = target_windows
           }
@@ -154,3 +169,4 @@ return {
   spookify = setup,
   setup = setup,
 }
+
