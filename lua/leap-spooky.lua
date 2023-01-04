@@ -40,7 +40,7 @@ local function spooky_action(action, kwargs)
     -- fallback to the default 'j', 'k' mapping.
     vim.g.leap_spooky_action = 1
     if non_textobj then
-        action() 
+        action()
     else
         vim.cmd("normal " .. action())  -- don't use bang - custom text objects should work too
     end
@@ -80,10 +80,16 @@ local default_affixes = {
 }
 
 local default_text_objects = {
-  'iw', 'iW', 'is', 'ip', 'i[', 'i]', 'i(', 'i)', 'ib',
-  'i>', 'i<', 'it', 'i{', 'i}', 'iB', 'i"', 'i\'', 'i`',
-  'aw', 'aW', 'as', 'ap', 'a[', 'a]', 'a(', 'a)', 'ab',
-  'a>', 'a<', 'at', 'a{', 'a}', 'aB', 'a"', 'a\'', 'a`',
+    'iw', 'iW', 'is', 'ip', 'i[', 'i]', 'i(', 'i)', 'ib',
+    'i>', 'i<', 'it', 'i{', 'i}', 'iB', 'i"', 'i\'', 'i`',
+    'i#', 'i$', 'i&', 'i*', 'i+', 'i,', 'i.', 'i/', 'i:',
+    'i;', 'i=', 'i_', 'i|', 'i~', 'ia', 'ib', 'ic', 'iC',
+    'if', 'ii', 'im', 'io', 'ip', 'is', 'it', 'iq', 'i w',
+    'aw', 'aW', 'as', 'ap', 'a[', 'a]', 'a(', 'a)', 'ab',
+    'a>', 'a<', 'at', 'a{', 'a}', 'aB', 'a"', 'a\'', 'a`',
+    'a#', 'a$', 'a&', 'a*', 'a+', 'a,', 'a.', 'a/', 'a:',
+    'a;', 'a=', 'a_', 'a|', 'a~', 'aa', 'ab', 'ac', 'aC',
+    'af', 'ai', 'am', 'ao', 'ap', 'as', 'at', 'aq', 'a w'
 }
 
 local function setup(kwargs)
@@ -106,7 +112,8 @@ local function setup(kwargs)
         table.insert(mappings, {
           scope = scope,
           keeppos = keeppos,
-          lhs = textobj:sub(1,1) .. key .. textobj:sub(2),
+          -- lhs = textobj:sub(1,1) .. key .. textobj:sub(2),
+          lhs = key .. textobj,
           action = function ()
             return v_exit() .. "v" .. vim.v.count1 .. textobj .. get_motion_force()
           end,
@@ -169,4 +176,3 @@ return {
   spookify = setup,
   setup = setup,
 }
-
